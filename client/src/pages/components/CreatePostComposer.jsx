@@ -17,15 +17,16 @@ import {
   IconButton,
   useMediaQuery,
 } from "@mui/material";
-import FlexBetween from "components/FlexBetween";
 import Dropzone from "react-dropzone";
-import UserImage from "components/UserImage";
-import WidgetWrapper from "components/WidgetWrapper";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setPosts } from "state";
+import { API_URL } from "../../config";
+import AvatarImage from "ui/AvatarImage";
+import PanelShell from "ui/PanelShell";
+import SplitLayout from "ui/SplitLayout";
 
-const MyPostWidget = ({ picturePath }) => {
+const CreatePostComposer = ({ picturePath }) => {
   const dispatch = useDispatch();
   const [isImage, setIsImage] = useState(false);
   const [image, setImage] = useState(null);
@@ -46,23 +47,30 @@ const MyPostWidget = ({ picturePath }) => {
       formData.append("picturePath", image.name);
     }
 
-    const response = await fetch(`http://localhost:3001/posts`, {
+    const response = await fetch(`${API_URL}/posts`, {
       method: "POST",
       headers: { Authorization: `Bearer ${token}` },
       body: formData,
     });
+
+    if (!response.ok) {
+      console.error("Failed to create post", response.status);
+      return;
+    }
+
     const posts = await response.json();
     dispatch(setPosts({ posts }));
     setImage(null);
     setPost("");
+    setIsImage(false);
   };
 
   return (
-    <WidgetWrapper>
-      <FlexBetween gap="1.5rem">
-        <UserImage image={picturePath} />
+    <PanelShell>
+      <SplitLayout gap="1.5rem">
+        <AvatarImage image={picturePath} />
         <InputBase
-          placeholder="What's on your mind..."
+          placeholder="Share an update with your network..."
           onChange={(e) => setPost(e.target.value)}
           value={post}
           sx={{
@@ -72,7 +80,7 @@ const MyPostWidget = ({ picturePath }) => {
             padding: "1rem 2rem",
           }}
         />
-      </FlexBetween>
+      </SplitLayout>
       {isImage && (
         <Box
           border={`1px solid ${medium}`}
@@ -86,7 +94,7 @@ const MyPostWidget = ({ picturePath }) => {
             onDrop={(acceptedFiles) => setImage(acceptedFiles[0])}
           >
             {({ getRootProps, getInputProps }) => (
-              <FlexBetween>
+              <SplitLayout>
                 <Box
                   {...getRootProps()}
                   border={`2px dashed ${palette.primary.main}`}
@@ -96,12 +104,12 @@ const MyPostWidget = ({ picturePath }) => {
                 >
                   <input {...getInputProps()} />
                   {!image ? (
-                    <p>Add Image Here</p>
+                    <p>Drop an image here</p>
                   ) : (
-                    <FlexBetween>
+                    <SplitLayout>
                       <Typography>{image.name}</Typography>
                       <EditOutlined />
-                    </FlexBetween>
+                    </SplitLayout>
                   )}
                 </Box>
                 {image && (
@@ -112,7 +120,7 @@ const MyPostWidget = ({ picturePath }) => {
                     <DeleteOutlined />
                   </IconButton>
                 )}
-              </FlexBetween>
+              </SplitLayout>
             )}
           </Dropzone>
         </Box>
@@ -120,38 +128,38 @@ const MyPostWidget = ({ picturePath }) => {
 
       <Divider sx={{ margin: "1.25rem 0" }} />
 
-      <FlexBetween>
-        <FlexBetween gap="0.25rem" onClick={() => setIsImage(!isImage)}>
+      <SplitLayout>
+        <SplitLayout gap="0.25rem" onClick={() => setIsImage(!isImage)}>
           <ImageOutlined sx={{ color: mediumMain }} />
           <Typography
             color={mediumMain}
             sx={{ "&:hover": { cursor: "pointer", color: medium } }}
           >
-            Image
+            Photo
           </Typography>
-        </FlexBetween>
+        </SplitLayout>
 
         {isNonMobileScreens ? (
           <>
-            <FlexBetween gap="0.25rem">
+            <SplitLayout gap="0.25rem">
               <GifBoxOutlined sx={{ color: mediumMain }} />
-              <Typography color={mediumMain}>Clip</Typography>
-            </FlexBetween>
+              <Typography color={mediumMain}>GIF</Typography>
+            </SplitLayout>
 
-            <FlexBetween gap="0.25rem">
+            <SplitLayout gap="0.25rem">
               <AttachFileOutlined sx={{ color: mediumMain }} />
-              <Typography color={mediumMain}>Attachment</Typography>
-            </FlexBetween>
+              <Typography color={mediumMain}>File</Typography>
+            </SplitLayout>
 
-            <FlexBetween gap="0.25rem">
+            <SplitLayout gap="0.25rem">
               <MicOutlined sx={{ color: mediumMain }} />
-              <Typography color={mediumMain}>Audio</Typography>
-            </FlexBetween>
+              <Typography color={mediumMain}>Voice</Typography>
+            </SplitLayout>
           </>
         ) : (
-          <FlexBetween gap="0.25rem">
+          <SplitLayout gap="0.25rem">
             <MoreHorizOutlined sx={{ color: mediumMain }} />
-          </FlexBetween>
+          </SplitLayout>
         )}
 
         <Button
@@ -163,11 +171,11 @@ const MyPostWidget = ({ picturePath }) => {
             borderRadius: "3rem",
           }}
         >
-          POST
+          PUBLISH
         </Button>
-      </FlexBetween>
-    </WidgetWrapper>
+      </SplitLayout>
+    </PanelShell>
   );
 };
 
-export default MyPostWidget;
+export default CreatePostComposer;

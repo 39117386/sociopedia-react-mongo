@@ -1,19 +1,19 @@
 import { Box, useMediaQuery } from "@mui/material";
 import { useSelector } from "react-redux";
-import Navbar from "scenes/navbar";
-import UserWidget from "scenes/widgets/UserWidget";
-import MyPostWidget from "scenes/widgets/MyPostWidget";
-import PostsWidget from "scenes/widgets/PostsWidget";
-import AdvertWidget from "scenes/widgets/AdvertWidget";
-import FriendListWidget from "scenes/widgets/FriendListWidget";
+import CreatePostComposer from "pages/components/CreatePostComposer";
+import FeedTimeline from "pages/components/FeedTimeline";
+import ProfileCard from "pages/components/ProfileCard";
+import SpotlightCard from "pages/components/SpotlightCard";
+import ConnectionsPanel from "pages/components/ConnectionsPanel";
+import Header from "pages/header";
 
-const HomePage = () => {
+const FeedPage = () => {
   const isNonMobileScreens = useMediaQuery("(min-width:1000px)");
   const { _id, picturePath } = useSelector((state) => state.user);
 
   return (
     <Box>
-      <Navbar />
+      <Header />
       <Box
         width="100%"
         padding="2rem 6%"
@@ -22,20 +22,20 @@ const HomePage = () => {
         justifyContent="space-between"
       >
         <Box flexBasis={isNonMobileScreens ? "26%" : undefined}>
-          <UserWidget userId={_id} picturePath={picturePath} />
+          <ProfileCard userId={_id} picturePath={picturePath} />
         </Box>
         <Box
           flexBasis={isNonMobileScreens ? "42%" : undefined}
           mt={isNonMobileScreens ? undefined : "2rem"}
         >
-          <MyPostWidget picturePath={picturePath} />
-          <PostsWidget userId={_id} />
+          <CreatePostComposer picturePath={picturePath} />
+          <FeedTimeline userId={_id} />
         </Box>
         {isNonMobileScreens && (
           <Box flexBasis="26%">
-            <AdvertWidget />
+            <SpotlightCard />
             <Box m="2rem 0" />
-            <FriendListWidget userId={_id} />
+            <ConnectionsPanel userId={_id} />
           </Box>
         )}
       </Box>
@@ -43,4 +43,4 @@ const HomePage = () => {
   );
 };
 
-export default HomePage;
+export default FeedPage;

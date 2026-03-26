@@ -23,9 +23,9 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { setMode, setLogout } from "state";
 import { useNavigate } from "react-router-dom";
-import FlexBetween from "components/FlexBetween";
+import SplitLayout from "ui/SplitLayout";
 
-const Navbar = () => {
+const Header = () => {
   const [isMobileMenuToggled, setIsMobileMenuToggled] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -42,8 +42,8 @@ const Navbar = () => {
   const fullName = `${user.firstName} ${user.lastName}`;
 
   return (
-    <FlexBetween padding="1rem 6%" backgroundColor={alt}>
-      <FlexBetween gap="1.75rem">
+    <SplitLayout padding="1rem 6%" backgroundColor={alt}>
+      <SplitLayout gap="1.75rem">
         <Typography
           fontWeight="bold"
           fontSize="clamp(1rem, 2rem, 2.25rem)"
@@ -59,23 +59,23 @@ const Navbar = () => {
           Sociopedia
         </Typography>
         {isNonMobileScreens && (
-          <FlexBetween
+          <SplitLayout
             backgroundColor={neutralLight}
             borderRadius="9px"
             gap="3rem"
             padding="0.1rem 1.5rem"
           >
-            <InputBase placeholder="Search..." />
+            <InputBase placeholder="Search members or posts..." />
             <IconButton>
               <Search />
             </IconButton>
-          </FlexBetween>
+          </SplitLayout>
         )}
-      </FlexBetween>
+      </SplitLayout>
 
       {/* DESKTOP NAV */}
       {isNonMobileScreens ? (
-        <FlexBetween gap="2rem">
+        <SplitLayout gap="2rem">
           <IconButton onClick={() => dispatch(setMode())}>
             {theme.palette.mode === "dark" ? (
               <DarkMode sx={{ fontSize: "25px" }} />
@@ -110,7 +110,7 @@ const Navbar = () => {
               <MenuItem onClick={() => dispatch(setLogout())}>Log Out</MenuItem>
             </Select>
           </FormControl>
-        </FlexBetween>
+        </SplitLayout>
       ) : (
         <IconButton
           onClick={() => setIsMobileMenuToggled(!isMobileMenuToggled)}
@@ -141,7 +141,7 @@ const Navbar = () => {
           </Box>
 
           {/* MENU ITEMS */}
-          <FlexBetween
+          <SplitLayout
             display="flex"
             flexDirection="column"
             justifyContent="center"
@@ -187,11 +187,11 @@ const Navbar = () => {
                 </MenuItem>
               </Select>
             </FormControl>
-          </FlexBetween>
+          </SplitLayout>
         </Box>
       )}
-    </FlexBetween>
+    </SplitLayout>
   );
 };
 
-export default Navbar;
+export default Header;

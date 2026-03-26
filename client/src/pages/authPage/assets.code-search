@@ -1,0 +1,5 @@
+# Asset Search Notes
+
+This file is a local scratch artifact kept for reference during development.
+Current asset handling lives in `client/src/config.js` and the backend static
+asset server configuration in `server/index.js`.

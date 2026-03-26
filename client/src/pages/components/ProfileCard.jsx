@@ -5,14 +5,15 @@ import {
   WorkOutlineOutlined,
 } from "@mui/icons-material";
 import { Box, Typography, Divider, useTheme } from "@mui/material";
-import UserImage from "components/UserImage";
-import FlexBetween from "components/FlexBetween";
-import WidgetWrapper from "components/WidgetWrapper";
 import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { API_URL, getAssetUrl } from "../../config";
+import AvatarImage from "ui/AvatarImage";
+import PanelShell from "ui/PanelShell";
+import SplitLayout from "ui/SplitLayout";
 
-const UserWidget = ({ userId, picturePath }) => {
+const ProfileCard = ({ userId, picturePath }) => {
   const [user, setUser] = useState(null);
   const { palette } = useTheme();
   const navigate = useNavigate();
@@ -22,17 +23,23 @@ const UserWidget = ({ userId, picturePath }) => {
   const main = palette.neutral.main;
 
   const getUser = async () => {
-    const response = await fetch(`http://localhost:3001/users/${userId}`, {
+    const response = await fetch(`${API_URL}/users/${userId}`, {
       method: "GET",
       headers: { Authorization: `Bearer ${token}` },
     });
+
+    if (!response.ok) {
+      console.error("Failed to fetch user", response.status);
+      return;
+    }
+
     const data = await response.json();
     setUser(data);
   };
 
   useEffect(() => {
     getUser();
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [userId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!user) {
     return null;
@@ -49,15 +56,14 @@ const UserWidget = ({ userId, picturePath }) => {
   } = user;
 
   return (
-    <WidgetWrapper>
-      {/* FIRST ROW */}
-      <FlexBetween
+    <PanelShell>
+      <SplitLayout
         gap="0.5rem"
         pb="1.1rem"
         onClick={() => navigate(`/profile/${userId}`)}
       >
-        <FlexBetween gap="1rem">
-          <UserImage image={picturePath} />
+        <SplitLayout gap="1rem">
+          <AvatarImage image={picturePath} size="60px" />
           <Box>
             <Typography
               variant="h4"
@@ -72,15 +78,14 @@ const UserWidget = ({ userId, picturePath }) => {
             >
               {firstName} {lastName}
             </Typography>
-            <Typography color={medium}>{friends.length} friends</Typography>
+            <Typography color={medium}>{friends.length} connections</Typography>
           </Box>
-        </FlexBetween>
+        </SplitLayout>
         <ManageAccountsOutlined />
-      </FlexBetween>
+      </SplitLayout>
 
       <Divider />
 
-      {/* SECOND ROW */}
       <Box p="1rem 0">
         <Box display="flex" alignItems="center" gap="1rem" mb="0.5rem">
           <LocationOnOutlined fontSize="large" sx={{ color: main }} />
@@ -94,58 +99,56 @@ const UserWidget = ({ userId, picturePath }) => {
 
       <Divider />
 
-      {/* THIRD ROW */}
       <Box p="1rem 0">
-        <FlexBetween mb="0.5rem">
-          <Typography color={medium}>Who's viewed your profile</Typography>
+        <SplitLayout mb="0.5rem">
+          <Typography color={medium}>Profile views</Typography>
           <Typography color={main} fontWeight="500">
             {viewedProfile}
           </Typography>
-        </FlexBetween>
-        <FlexBetween>
-          <Typography color={medium}>Impressions of your post</Typography>
+        </SplitLayout>
+        <SplitLayout>
+          <Typography color={medium}>Post impressions</Typography>
           <Typography color={main} fontWeight="500">
             {impressions}
           </Typography>
-        </FlexBetween>
+        </SplitLayout>
       </Box>
 
       <Divider />
 
-      {/* FOURTH ROW */}
       <Box p="1rem 0">
         <Typography fontSize="1rem" color={main} fontWeight="500" mb="1rem">
-          Social Profiles
+          Social Presence
         </Typography>
 
-        <FlexBetween gap="1rem" mb="0.5rem">
-          <FlexBetween gap="1rem">
-            <img src="../assets/twitter.png" alt="twitter" />
+        <SplitLayout gap="1rem" mb="0.5rem">
+          <SplitLayout gap="1rem">
+            <img src={getAssetUrl("twitter.png")} alt="twitter" />
             <Box>
               <Typography color={main} fontWeight="500">
-                Twitter
+                X / Twitter
               </Typography>
-              <Typography color={medium}>Social Network</Typography>
+              <Typography color={medium}>Short-form updates</Typography>
             </Box>
-          </FlexBetween>
+          </SplitLayout>
           <EditOutlined sx={{ color: main }} />
-        </FlexBetween>
+        </SplitLayout>
 
-        <FlexBetween gap="1rem">
-          <FlexBetween gap="1rem">
-            <img src="../assets/linkedin.png" alt="linkedin" />
+        <SplitLayout gap="1rem">
+          <SplitLayout gap="1rem">
+            <img src={getAssetUrl("linkedin.png")} alt="linkedin" />
             <Box>
               <Typography color={main} fontWeight="500">
                 Linkedin
               </Typography>
-              <Typography color={medium}>Network Platform</Typography>
+              <Typography color={medium}>Professional profile</Typography>
             </Box>
-          </FlexBetween>
+          </SplitLayout>
           <EditOutlined sx={{ color: main }} />
-        </FlexBetween>
+        </SplitLayout>
       </Box>
-    </WidgetWrapper>
+    </PanelShell>
   );
 };
 
-export default UserWidget;
+export default ProfileCard;

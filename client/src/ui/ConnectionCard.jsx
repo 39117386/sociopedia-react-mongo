@@ -3,10 +3,11 @@ import { Box, IconButton, Typography, useTheme } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { setFriends } from "state";
-import FlexBetween from "./FlexBetween";
-import UserImage from "./UserImage";
+import { API_URL } from "../config";
+import AvatarImage from "./AvatarImage";
+import SplitLayout from "./SplitLayout";
 
-const Friend = ({ friendId, name, subtitle, userPicturePath }) => {
+const ConnectionCard = ({ friendId, name, subtitle, userPicturePath }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { _id } = useSelector((state) => state.user);
@@ -22,28 +23,30 @@ const Friend = ({ friendId, name, subtitle, userPicturePath }) => {
   const isFriend = friends.find((friend) => friend._id === friendId);
 
   const patchFriend = async () => {
-    const response = await fetch(
-      `http://localhost:3001/users/${_id}/${friendId}`,
-      {
-        method: "PATCH",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    const response = await fetch(`${API_URL}/users/${_id}/${friendId}`, {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      console.error("Failed to update friend status", response.status);
+      return;
+    }
+
     const data = await response.json();
     dispatch(setFriends({ friends: data }));
   };
 
   return (
-    <FlexBetween>
-      <FlexBetween gap="1rem">
-        <UserImage image={userPicturePath} size="55px" />
+    <SplitLayout>
+      <SplitLayout gap="1rem">
+        <AvatarImage image={userPicturePath} size="55px" />
         <Box
           onClick={() => {
             navigate(`/profile/${friendId}`);
-            navigate(0);
           }}
         >
           <Typography
@@ -63,7 +66,7 @@ const Friend = ({ friendId, name, subtitle, userPicturePath }) => {
             {subtitle}
           </Typography>
         </Box>
-      </FlexBetween>
+      </SplitLayout>
       <IconButton
         onClick={() => patchFriend()}
         sx={{ backgroundColor: primaryLight, p: "0.6rem" }}
@@ -74,8 +77,8 @@ const Friend = ({ friendId, name, subtitle, userPicturePath }) => {
           <PersonAddOutlined sx={{ color: primaryDark }} />
         )}
       </IconButton>
-    </FlexBetween>
+    </SplitLayout>
   );
 };
 
-export default Friend;
+export default ConnectionCard;

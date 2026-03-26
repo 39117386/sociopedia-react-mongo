@@ -6,7 +6,7 @@ export const createPost = async (req, res) => {
   try {
     const { userId, description, picturePath } = req.body;
     const user = await User.findById(userId);
-    const normalizedPicturePath = req.file?.filename || picturePath || "";
+    const normalizedPicturePath = req.uploadedFilePath || picturePath || "";
 
     const newPost = new Post({
       userId,

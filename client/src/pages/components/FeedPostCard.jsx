@@ -5,14 +5,15 @@ import {
   ShareOutlined,
 } from "@mui/icons-material";
 import { Box, Divider, IconButton, Typography, useTheme } from "@mui/material";
-import FlexBetween from "components/FlexBetween";
-import Friend from "components/Friend";
-import WidgetWrapper from "components/WidgetWrapper";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setPost } from "state";
+import { API_URL, getAssetUrl } from "../../config";
+import ConnectionCard from "ui/ConnectionCard";
+import PanelShell from "ui/PanelShell";
+import SplitLayout from "ui/SplitLayout";
 
-const PostWidget = ({
+const FeedPostCard = ({
   postId,
   postUserId,
   name,
@@ -35,7 +36,7 @@ const PostWidget = ({
   const primary = palette.primary.main;
 
   const patchLike = async () => {
-    const response = await fetch(`http://localhost:3001/posts/${postId}/like`, {
+    const response = await fetch(`${API_URL}/posts/${postId}/like`, {
       method: "PATCH",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -43,13 +44,19 @@ const PostWidget = ({
       },
       body: JSON.stringify({ userId: loggedInUserId }),
     });
+
+    if (!response.ok) {
+      console.error("Failed to like post", response.status);
+      return;
+    }
+
     const updatedPost = await response.json();
     dispatch(setPost({ post: updatedPost }));
   };
 
   return (
-    <WidgetWrapper m="2rem 0">
-      <Friend
+    <PanelShell m="2rem 0">
+      <ConnectionCard
         friendId={postUserId}
         name={name}
         subtitle={location}
@@ -64,12 +71,12 @@ const PostWidget = ({
           height="auto"
           alt="post"
           style={{ borderRadius: "0.75rem", marginTop: "0.75rem" }}
-          src={`http://localhost:3001/assets/${picturePath}`}
+          src={getAssetUrl(picturePath)}
         />
       )}
-      <FlexBetween mt="0.25rem">
-        <FlexBetween gap="1rem">
-          <FlexBetween gap="0.3rem">
+      <SplitLayout mt="0.25rem">
+        <SplitLayout gap="1rem">
+          <SplitLayout gap="0.3rem">
             <IconButton onClick={patchLike}>
               {isLiked ? (
                 <FavoriteOutlined sx={{ color: primary }} />
@@ -78,20 +85,20 @@ const PostWidget = ({
               )}
             </IconButton>
             <Typography>{likeCount}</Typography>
-          </FlexBetween>
+          </SplitLayout>
 
-          <FlexBetween gap="0.3rem">
+          <SplitLayout gap="0.3rem">
             <IconButton onClick={() => setIsComments(!isComments)}>
               <ChatBubbleOutlineOutlined />
             </IconButton>
             <Typography>{comments.length}</Typography>
-          </FlexBetween>
-        </FlexBetween>
+          </SplitLayout>
+        </SplitLayout>
 
         <IconButton>
           <ShareOutlined />
         </IconButton>
-      </FlexBetween>
+      </SplitLayout>
       {isComments && (
         <Box mt="0.5rem">
           {comments.map((comment, i) => (
@@ -105,8 +112,8 @@ const PostWidget = ({
           <Divider />
         </Box>
       )}
-    </WidgetWrapper>
+    </PanelShell>
   );
 };
 
-export default PostWidget;
+export default FeedPostCard;

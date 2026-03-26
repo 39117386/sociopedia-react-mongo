@@ -1,6 +1,7 @@
 import { Box } from "@mui/material";
+import { getAssetUrl } from "../config";
 
-const UserImage = ({ image, size = "60px" }) => {
+const AvatarImage = ({ image, size = "60px" }) => {
   return (
     <Box width={size} height={size}>
       <img
@@ -8,10 +9,10 @@ const UserImage = ({ image, size = "60px" }) => {
         width={size}
         height={size}
         alt="user"
-        src={`http://localhost:3001/assets/${image}`}
+        src={getAssetUrl(image)}
       />
     </Box>
   );
 };
 
-export default UserImage;
+export default AvatarImage;

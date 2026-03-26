@@ -1,7 +1,7 @@
 import { Box, Typography, useTheme, useMediaQuery } from "@mui/material";
-import Form from "./Form";
+import AuthForm from "./AuthForm";
 
-const LoginPage = () => {
+const AuthPage = () => {
   const theme = useTheme();
   const isNonMobileScreens = useMediaQuery("(min-width: 1000px)");
   return (
@@ -25,12 +25,12 @@ const LoginPage = () => {
         backgroundColor={theme.palette.background.alt}
       >
         <Typography fontWeight="500" variant="h5" sx={{ mb: "1.5rem" }}>
-          Welcome to Socipedia, the Social Media for Sociopaths!
+          Welcome to Sociopedia, your space to connect and share.
         </Typography>
-        <Form />
+        <AuthForm />
       </Box>
     </Box>
   );
 };
 
-export default LoginPage;
+export default AuthPage;

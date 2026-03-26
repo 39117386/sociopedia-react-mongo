@@ -14,7 +14,8 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setLogin } from "state";
 import Dropzone from "react-dropzone";
-import FlexBetween from "components/FlexBetween";
+import { API_URL } from "../../config";
+import SplitLayout from "ui/SplitLayout";
 
 const registerSchema = yup.object().shape({
   firstName: yup.string().required("required"),
@@ -23,7 +24,7 @@ const registerSchema = yup.object().shape({
   password: yup.string().required("required"),
   location: yup.string().required("required"),
   occupation: yup.string().required("required"),
-  picture: yup.string().required("required"),
+  picture: yup.mixed().required("required"),
 });
 
 const loginSchema = yup.object().shape({
@@ -46,7 +47,7 @@ const initialValuesLogin = {
   password: "",
 };
 
-const Form = () => {
+const AuthForm = () => {
   const [pageType, setPageType] = useState("login");
   const { palette } = useTheme();
   const dispatch = useDispatch();
@@ -56,7 +57,6 @@ const Form = () => {
   const isRegister = pageType === "register";
 
   const register = async (values, onSubmitProps) => {
-    // this allows us to send form info with image
     const formData = new FormData();
     for (let value in values) {
       formData.append(value, values[value]);
@@ -64,12 +64,18 @@ const Form = () => {
     formData.append("picturePath", values.picture.name);
 
     const savedUserResponse = await fetch(
-      "http://localhost:3001/auth/register",
+      `${API_URL}/auth/register`,
       {
         method: "POST",
         body: formData,
       }
     );
+
+    if (!savedUserResponse.ok) {
+      console.error("Failed to register", savedUserResponse.status);
+      return;
+    }
+
     const savedUser = await savedUserResponse.json();
     onSubmitProps.resetForm();
 
@@ -79,22 +85,30 @@ const Form = () => {
   };
 
   const login = async (values, onSubmitProps) => {
-    const loggedInResponse = await fetch("http://localhost:3001/auth/login", {
+    const response = await fetch(`${API_URL}/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(values),
     });
-    const loggedIn = await loggedInResponse.json();
-    onSubmitProps.resetForm();
-    if (loggedIn) {
+
+    if (!response.ok) {
+      console.error("Failed to login", response.status);
+      return;
+    }
+
+    const data = await response.json();
+
+    if (data) {
       dispatch(
         setLogin({
-          user: loggedIn.user,
-          token: loggedIn.token,
+          user: data.user,
+          token: data.token,
         })
       );
       navigate("/home");
     }
+
+    onSubmitProps.resetForm();
   };
 
   const handleFormSubmit = async (values, onSubmitProps) => {
@@ -195,12 +209,12 @@ const Form = () => {
                       >
                         <input {...getInputProps()} />
                         {!values.picture ? (
-                          <p>Add Picture Here</p>
+                          <p>Select a profile image</p>
                         ) : (
-                          <FlexBetween>
+                          <SplitLayout>
                             <Typography>{values.picture.name}</Typography>
                             <EditOutlinedIcon />
-                          </FlexBetween>
+                          </SplitLayout>
                         )}
                       </Box>
                     )}
@@ -232,7 +246,6 @@ const Form = () => {
             />
           </Box>
 
-          {/* BUTTONS */}
           <Box>
             <Button
               fullWidth
@@ -245,7 +258,7 @@ const Form = () => {
                 "&:hover": { color: palette.primary.main },
               }}
             >
-              {isLogin ? "LOGIN" : "REGISTER"}
+              {isLogin ? "SIGN IN" : "CREATE ACCOUNT"}
             </Button>
             <Typography
               onClick={() => {
@@ -262,8 +275,8 @@ const Form = () => {
               }}
             >
               {isLogin
-                ? "Don't have an account? Sign Up here."
-                : "Already have an account? Login here."}
+                ? "New here? Create your account."
+                : "Already registered? Sign in instead."}
             </Typography>
           </Box>
         </form>
@@ -272,4 +285,4 @@ const Form = () => {
   );
 };
 
-export default Form;
+export default AuthForm;
